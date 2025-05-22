@@ -14,7 +14,18 @@ namespace TodoApi.Endpoints
             
             var group = app.MapGroup("/todo");
 
-            group.MapPost("/", async Task<IResult> (CreateTodoDto createTodo, TodoContext dbContext) =>
+            group.MapPost("/", TodoHandlers.CreateTodo);
+            group.MapGet("/", TodoHandlers.GetAllTodos);
+            group.MapGet("/{id}", TodoHandlers.GetTodoById);
+            group.MapPut("/{id}", TodoHandlers.UpdateTodo);
+            group.MapDelete("/{id}", TodoHandlers.DeleteTodo);
+
+            return group;
+        }
+
+        public static class TodoHandlers
+        {
+            public static async Task<IResult> CreateTodo(CreateTodoDto createTodo, TodoContext dbContext)
             {
                 var todo = new Todo
                 {
@@ -29,16 +40,16 @@ namespace TodoApi.Endpoints
                 await dbContext.SaveChangesAsync();
 
                 return Results.Created($"/todo/{todo.Id}", todo);
-            });
+            }
 
-            group.MapGet("/", async Task<IResult> (TodoContext dbContext) =>
+            public static async Task<IResult> GetAllTodos(TodoContext dbContext)
             {
                 var todo = await dbContext.Todos.ToListAsync();
 
                 return TypedResults.Ok(todo);
-            });
+            }
 
-            group.MapGet("/{id}", async Task<Results<Ok<Todo>, NotFound>> (int id, TodoContext dbContext) =>
+            public static async Task<Results<Ok<Todo>, NotFound>> GetTodoById(int id, TodoContext dbContext)
             {
                 var todo = await dbContext.Todos.FindAsync(id);
 
@@ -46,9 +57,9 @@ namespace TodoApi.Endpoints
                     return TypedResults.NotFound();
 
                 return TypedResults.Ok(todo);
-            });
+            }
 
-            group.MapPut("/{id}", async Task<Results<NoContent, NotFound>> (int id, UpdateTodoDto updateTodo, TodoContext dbContext) =>
+            public static async Task<Results<NoContent, NotFound>> UpdateTodo(int id, UpdateTodoDto updateTodo, TodoContext dbContext)
             {
                 var todo = await dbContext.Todos.FindAsync(id);
 
@@ -63,9 +74,9 @@ namespace TodoApi.Endpoints
                 await dbContext.SaveChangesAsync();
 
                 return TypedResults.NoContent();
-            });
+            }
 
-            group.MapDelete("/{id}", async Task<Results<NoContent, NotFound>> (int id, TodoContext dbContext) =>
+            public static async Task<Results<NoContent, NotFound>> DeleteTodo(int id, TodoContext dbContext)
             {
                 var todo = await dbContext.Todos.FindAsync(id);
 
@@ -76,10 +87,7 @@ namespace TodoApi.Endpoints
                 await dbContext.SaveChangesAsync();
 
                 return TypedResults.NoContent();
-            });
-
-
-            return group;
+            }
         }
     }
 }
