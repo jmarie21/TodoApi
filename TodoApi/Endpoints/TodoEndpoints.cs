@@ -11,6 +11,7 @@ namespace TodoApi.Endpoints
     {
         public static RouteGroupBuilder MapTodoEndpoints(this WebApplication app)
         {
+            
             var group = app.MapGroup("/todo");
 
             group.MapPost("/", async Task<IResult> (CreateTodoDto createTodo, TodoContext dbContext) =>
@@ -19,7 +20,7 @@ namespace TodoApi.Endpoints
                 {
                     Title = createTodo.Title,
                     Description = createTodo.Description,
-                    IsComplete = createTodo.IsComplete,
+                    IsComplete = false,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
