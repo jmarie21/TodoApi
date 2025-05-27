@@ -20,5 +20,6 @@ var app = builder.Build();
 app.UseCors("AllowAll");
 
 app.MapTodoEndpoints();
+app.MapUserEndPoints();
 
 app.Run();
